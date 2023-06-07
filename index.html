@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Chemical Plant Cost Estimator</title>
+    </head>
+    <body style="background-color: white;" onload="initialize()">
+        <style>
+            .equipmentList {
+                    border-bottom: 1px solid #7a7a7a;
+                }
+        </style>
+        <div style="background-color: white; height:100%; width: 70%;">
+            <div style="margin:40px; font-family:Arial; background-color: white;">
+                <H2>Chemical Plant Cost Estimator</H2>
+                <span style="font-size: small;">Detailed Factor Estimate from Towler & Sinnott (6th Ed, SI Edition): Chapter 6 </span>
+                <br>
+                <br>
+
+                <!-- Project Setup Table-->
+                <H3>Project Setup</H3>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td><div style="width:150px;">Process Type:</div></td>
+                            <td><div style="width:150px;"><select name="Process" id="inputProcessType" onclick="drawTable()" style="padding-left: 3px; padding-right: 5px; width: 90%;">
+                                <option value="fluid">Fluid</option>
+                                <option value="fluidsolid">Fluid & Solid</option>
+                                <option value="solid">Solid</option>
+                            </select></div></td>
+                            <td><div style="width:150px;">Current CE Plant Cost Index (CEPCI):</div></td>
+                            <td><div style="width:250px;"><input type="number" id="inputCEPCI" value='813' onkeyup="getDisplayCurrency(); drawTable()" style="padding-left: 3px; width: 70px;"/></div></td>
+                        </tr>
+                        <tr>
+                            <td><div style="width:150px;">Currency:</div></td>
+                            <td><div style="width:150px;"><select name="currency" id="inputCurrency" onclick="getDisplayCurrency(); drawTable()" style="padding-left: 3px; padding-right: 5px; width: 90%;">
+                                <option value="USD">USD</option>
+                                <option value="EUR">EUR</option>
+                                <option value="GBP">GBP</option>
+                                <option value="currency">Custom</option>
+                            </select></div></td>
+                            <td><div style="width:250px;">USD/<span id="currencyBox0">currency</span> Exchange Rate:</div></td>
+                            <td><div style="width:150px;"><input type="number" id="inputExchangeRate" value='1' onkeyup="drawTable()" style="padding-left: 3px; width: 70px;"/></div></td>
+                        </tr>
+                        <tr>
+                            <td><div style="width:150px;">Plant Location:</div></td>
+                            <td><div style="width:150px;"><select name="Country" id="inputCountry" value="US" style="padding-left: 3px; padding-right: 5px; width: 90%;">
+                                <option value="US">United States</option>
+                                <option value="" disabled>--------------</option>
+                                <option value="AF">Afghanistan</option>
+                                <option value="AX">Aland Islands</option>
+                                <option value="AL">Albania</option>
+                                <option value="DZ">Algeria</option>
+                                <option value="AS">American Samoa</option>
+                                <option value="AD">Andorra</option>
+                                <option value="AO">Angola</option>
+                                <option value="AI">Anguilla</option>
+                                <option value="AQ">Antarctica</option>
+                                <option value="AG">Antigua and Barbuda</option>
+                                <option value="AR">Argentina</option>
+                                <option value="AM">Armenia</option>
+                                <option value="AW">Aruba</option>
+                                <option value="AU">Australia</option>
+                                <option value="AT">Austria</option>
+                                <option value="AZ">Azerbaijan</option>
+                                <option value="BS">Bahamas</option>
+                                <option value="BH">Bahrain</option>
+                                <option value="BD">Bangladesh</option>
+                                <option value="BB">Barbados</option>
+                                <option value="BY">Belarus</option>
+                                <option value="BE">Belgium</option>
+                                <option value="BZ">Belize</option>
+                                <option value="BJ">Benin</option>
+                                <option value="BM">Bermuda</option>
+                                <option value="BT">Bhutan</option>
+                                <option value="BO">Bolivia</option>
+                                <option value="BQ">Bonaire, Sint Eustatius and Saba</option>
+                                <option value="BA">Bosnia and Herzegovina</option>
+                                <option value="BW">Botswana</option>
+                                <option value="BV">Bouvet Island</option>
+                                <option value="BR">Brazil</option>
+                                <option value="IO">British Indian Ocean Territory</option>
+                                <option value="BN">Brunei Darussalam</option>
+                                <option value="BG">Bulgaria</option>
+                                <option value="BF">Burkina Faso</option>
+                                <option value="BI">Burundi</option>
+                                <option value="KH">Cambodia</option>
+                                <option value="CM">Cameroon</option>
+                                <option value="CA">Canada</option>
+                                <option value="CV">Cape Verde</option>
+                                <option value="KY">Cayman Islands</option>
+                                <option value="CF">Central African Republic</option>
+                                <option value="TD">Chad</option>
+                                <option value="CL">Chile</option>
+                                <option value="CN">China</option>
+                                <option value="CX">Christmas Island</option>
+                                <option value="CC">Cocos (Keeling) Islands</option>
+                                <option value="CO">Colombia</option>
+                                <option value="KM">Comoros</option>
+                                <option value="CG">Congo</option>
+                                <option value="CD">Congo, Democratic Republic of the Congo</option>
+                                <option value="CK">Cook Islands</option>
+                                <option value="CR">Costa Rica</option>
+                                <option value="CI">Cote D'Ivoire</option>
+                                <option value="HR">Croatia</option>
+                                <option value="CU">Cuba</option>
+                                <option value="CW">Curacao</option>
+                                <option value="CY">Cyprus</option>
+                                <option value="CZ">Czech Republic</option>
+                                <option value="DK">Denmark</option>
+                                <option value="DJ">Djibouti</option>
+                                <option value="DM">Dominica</option>
+                                <option value="DO">Dominican Republic</option>
+                                <option value="EC">Ecuador</option>
+                                <option value="EG">Egypt</option>
+                                <option value="SV">El Salvador</option>
+                                <option value="GQ">Equatorial Guinea</option>
+                                <option value="ER">Eritrea</option>
+                                <option value="EE">Estonia</option>
+                                <option value="ET">Ethiopia</option>
+                                <option value="FK">Falkland Islands (Malvinas)</option>
+                                <option value="FO">Faroe Islands</option>
+                                <option value="FJ">Fiji</option>
+                                <option value="FI">Finland</option>
+                                <option value="FR">France</option>
+                                <option value="GF">French Guiana</option>
+                                <option value="PF">French Polynesia</option>
+                                <option value="TF">French Southern Territories</option>
+                                <option value="GA">Gabon</option>
+                                <option value="GM">Gambia</option>
+                                <option value="GE">Georgia</option>
+                                <option value="DE">Germany</option>
+                                <option value="GH">Ghana</option>
+                                <option value="GI">Gibraltar</option>
+                                <option value="GR">Greece</option>
+                                <option value="GL">Greenland</option>
+                                <option value="GD">Grenada</option>
+                                <option value="GP">Guadeloupe</option>
+                                <option value="GU">Guam</option>
+                                <option value="GT">Guatemala</option>
+                                <option value="GG">Guernsey</option>
+                                <option value="GN">Guinea</option>
+                                <option value="GW">Guinea-Bissau</option>
+                                <option value="GY">Guyana</option>
+                                <option value="HT">Haiti</option>
+                                <option value="HM">Heard Island and Mcdonald Islands</option>
+                                <option value="VA">Holy See (Vatican City State)</option>
+                                <option value="HN">Honduras</option>
+                                <option value="HK">Hong Kong</option>
+                                <option value="HU">Hungary</option>
+                                <option value="IS">Iceland</option>
+                                <option value="IN">India</option>
+                                <option value="ID">Indonesia</option>
+                                <option value="IR">Iran, Islamic Republic of</option>
+                                <option value="IQ">Iraq</option>
+                                <option value="IE">Ireland</option>
+                                <option value="IM">Isle of Man</option>
+                                <option value="IL">Israel</option>
+                                <option value="IT">Italy</option>
+                                <option value="JM">Jamaica</option>
+                                <option value="JP">Japan</option>
+                                <option value="JE">Jersey</option>
+                                <option value="JO">Jordan</option>
+                                <option value="KZ">Kazakhstan</option>
+                                <option value="KE">Kenya</option>
+                                <option value="KI">Kiribati</option>
+                                <option value="KP">Korea, Democratic People's Republic of</option>
+                                <option value="KR">Korea, Republic of</option>
+                                <option value="XK">Kosovo</option>
+                                <option value="KW">Kuwait</option>
+                                <option value="KG">Kyrgyzstan</option>
+                                <option value="LA">Lao People's Democratic Republic</option>
+                                <option value="LV">Latvia</option>
+                                <option value="LB">Lebanon</option>
+                                <option value="LS">Lesotho</option>
+                                <option value="LR">Liberia</option>
+                                <option value="LY">Libyan Arab Jamahiriya</option>
+                                <option value="LI">Liechtenstein</option>
+                                <option value="LT">Lithuania</option>
+                                <option value="LU">Luxembourg</option>
+                                <option value="MO">Macao</option>
+                                <option value="MK">Macedonia, the Former Yugoslav Republic of</option>
+                                <option value="MG">Madagascar</option>
+                                <option value="MW">Malawi</option>
+                                <option value="MY">Malaysia</option>
+                                <option value="MV">Maldives</option>
+                                <option value="ML">Mali</option>
+                                <option value="MT">Malta</option>
+                                <option value="MH">Marshall Islands</option>
+                                <option value="MQ">Martinique</option>
+                                <option value="MR">Mauritania</option>
+                                <option value="MU">Mauritius</option>
+                                <option value="YT">Mayotte</option>
+                                <option value="MX">Mexico</option>
+                                <option value="FM">Micronesia, Federated States of</option>
+                                <option value="MD">Moldova, Republic of</option>
+                                <option value="MC">Monaco</option>
+                                <option value="MN">Mongolia</option>
+                                <option value="ME">Montenegro</option>
+                                <option value="MS">Montserrat</option>
+                                <option value="MA">Morocco</option>
+                                <option value="MZ">Mozambique</option>
+                                <option value="MM">Myanmar</option>
+                                <option value="NA">Namibia</option>
+                                <option value="NR">Nauru</option>
+                                <option value="NP">Nepal</option>
+                                <option value="NL">Netherlands</option>
+                                <option value="AN">Netherlands Antilles</option>
+                                <option value="NC">New Caledonia</option>
+                                <option value="NZ">New Zealand</option>
+                                <option value="NI">Nicaragua</option>
+                                <option value="NE">Niger</option>
+                                <option value="NG">Nigeria</option>
+                                <option value="NU">Niue</option>
+                                <option value="NF">Norfolk Island</option>
+                                <option value="MP">Northern Mariana Islands</option>
+                                <option value="NO">Norway</option>
+                                <option value="OM">Oman</option>
+                                <option value="PK">Pakistan</option>
+                                <option value="PW">Palau</option>
+                                <option value="PS">Palestinian Territory, Occupied</option>
+                                <option value="PA">Panama</option>
+                                <option value="PG">Papua New Guinea</option>
+                                <option value="PY">Paraguay</option>
+                                <option value="PE">Peru</option>
+                                <option value="PH">Philippines</option>
+                                <option value="PN">Pitcairn</option>
+                                <option value="PL">Poland</option>
+                                <option value="PT">Portugal</option>
+                                <option value="PR">Puerto Rico</option>
+                                <option value="QA">Qatar</option>
+                                <option value="RE">Reunion</option>
+                                <option value="RO">Romania</option>
+                                <option value="RU">Russian Federation</option>
+                                <option value="RW">Rwanda</option>
+                                <option value="BL">Saint Barthelemy</option>
+                                <option value="SH">Saint Helena</option>
+                                <option value="KN">Saint Kitts and Nevis</option>
+                                <option value="LC">Saint Lucia</option>
+                                <option value="MF">Saint Martin</option>
+                                <option value="PM">Saint Pierre and Miquelon</option>
+                                <option value="VC">Saint Vincent and the Grenadines</option>
+                                <option value="WS">Samoa</option>
+                                <option value="SM">San Marino</option>
+                                <option value="ST">Sao Tome and Principe</option>
+                                <option value="SA">Saudi Arabia</option>
+                                <option value="SN">Senegal</option>
+                                <option value="RS">Serbia</option>
+                                <option value="CS">Serbia and Montenegro</option>
+                                <option value="SC">Seychelles</option>
+                                <option value="SL">Sierra Leone</option>
+                                <option value="SG">Singapore</option>
+                                <option value="SX">Sint Maarten</option>
+                                <option value="SK">Slovakia</option>
+                                <option value="SI">Slovenia</option>
+                                <option value="SB">Solomon Islands</option>
+                                <option value="SO">Somalia</option>
+                                <option value="ZA">South Africa</option>
+                                <option value="GS">South Georgia and the South Sandwich Islands</option>
+                                <option value="SS">South Sudan</option>
+                                <option value="ES">Spain</option>
+                                <option value="LK">Sri Lanka</option>
+                                <option value="SD">Sudan</option>
+                                <option value="SR">Suriname</option>
+                                <option value="SJ">Svalbard and Jan Mayen</option>
+                                <option value="SZ">Swaziland</option>
+                                <option value="SE">Sweden</option>
+                                <option value="CH">Switzerland</option>
+                                <option value="SY">Syrian Arab Republic</option>
+                                <option value="TW">Taiwan, Province of China</option>
+                                <option value="TJ">Tajikistan</option>
+                                <option value="TZ">Tanzania, United Republic of</option>
+                                <option value="TH">Thailand</option>
+                                <option value="TL">Timor-Leste</option>
+                                <option value="TG">Togo</option>
+                                <option value="TK">Tokelau</option>
+                                <option value="TO">Tonga</option>
+                                <option value="TT">Trinidad and Tobago</option>
+                                <option value="TN">Tunisia</option>
+                                <option value="TR">Turkey</option>
+                                <option value="TM">Turkmenistan</option>
+                                <option value="TC">Turks and Caicos Islands</option>
+                                <option value="TV">Tuvalu</option>
+                                <option value="UG">Uganda</option>
+                                <option value="UA">Ukraine</option>
+                                <option value="AE">United Arab Emirates</option>
+                                <option value="GB">United Kingdom</option>
+                                <option value="US">United States</option>
+                                <option value="UM">United States Minor Outlying Islands</option>
+                                <option value="UY">Uruguay</option>
+                                <option value="UZ">Uzbekistan</option>
+                                <option value="VU">Vanuatu</option>
+                                <option value="VE">Venezuela</option>
+                                <option value="VN">Viet Nam</option>
+                                <option value="VG">Virgin Islands, British</option>
+                                <option value="VI">Virgin Islands, U.s.</option>
+                                <option value="WF">Wallis and Futuna</option>
+                                <option value="EH">Western Sahara</option>
+                                <option value="YE">Yemen</option>
+                                <option value="ZM">Zambia</option>
+                                <option value="ZW">Zimbabwe</option>
+                                <option value="customLocation">Custom</option>
+                            </select></div></td>
+                            <td><div style="width:250px;">Location Factor</div></td>
+                            <td><div style="width:150px;"><input type="number" id="inputLocFac" value='1' onkeyup="drawTable()" style="padding-left: 3px; width: 70px;"/></div></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <br>
+                <br>
+                <!-- Equipment Table-->
+                <H3>Equipment List</H3>
+                <table style="border: 1px solid #7e7e7e">
+                    <tr class="equipmentList">
+                        <td style="font-weight: bold;"><div style="width:25px;"></div></td>
+                        <td style="font-weight: bold;"><div style="width:150px;">Equipment Name</div></td>
+                        <td style="font-weight: bold;"><div style="width:250px;">Equipment Type</div></td>
+                        <td style="font-weight: bold;"><div style="width:70px;">Quantity</div></td>
+                        <td style="font-weight: bold;"><div style="width:200px;">Characteristic Value</div></td>
+                        <td style="font-weight: bold;"><div style="width:150px;">Material</div></td>
+                        <td style="font-weight: bold;"><div style="width:150px;" id="currencyBox"></div></td>
+                        <td style="font-weight: bold;"><div style="width:100px;"><button onclick="deleteAll();">Delete All</button></div></td>
+                    </tr>
+                    <tbody id="maintable"></tbody>
+                    <tbody id="placeholderTable"></tbody>
+                </table>
+                <p style="font-size: small;">All costs adjusted for inflation, location, and currency.</p>
+
+                <br>
+                <!-- add item input field -->
+                <div style="background-color: lightgrey; color: black; height: 90px; width: 1000px; padding:20px;"> 
+                    
+                    <!-- custom item field -->
+                    <div id="customEquipmentDiv" >
+                        <table>
+                            <tr>
+                                <td style="font-weight: bold;">Equipment Name</td>
+                                <td style="font-weight: bold;">Equipment Type</td>
+                                <td style="font-weight: bold;">Quantity</td>
+                                <td style="width:150px; font-weight: bold;">Material</td>
+                                <td style="font-weight: bold;">Equipment Cost [<span id="currencyBoxCustom"></span>]</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" id="inputCustomEquipmentName" placeholder='i.e. "HEX-123"' style="padding-left: 3px;"/></td>
+                                <td><input type="text" id="inputCustomEquipmentType" placeholder='i.e. "Reactor"' style="padding-left: 3px;"/></td>
+                                <td><input type="number" id="inputCustomQuantity" placeholder='#' style="padding-left: 3px; width: 70px;"/></td>
+                                <td>
+                                    <select name="material" id="inputCustomMaterial" style="padding-left: 3px; padding-right: 5px; width: 150px;">
+                                        <option>Carbon Steel</option>
+                                        <option>Aluminium</option>
+                                        <option>Bronze</option>
+                                        <option>Cast Steel</option>
+                                        <option>SS 304</option>
+                                        <option>SS 316</option>
+                                        <option>SS 321</option>
+                                        <option>Hastelloy C</option>
+                                        <option>Monel</option>
+                                        <option>Nickel</option>
+                                        <option>Inconel</option>
+                                    </select>
+                                </td>
+                                <td><input type="number" id="inputCustomCost" placeholder='Single Item Cost' style="padding-left: 3px; width: 250px;"/></td>
+                                <td>
+                                    <button onclick="addCustomRow()">Add Item</button>
+                                </td>
+                            </tr>
+                            
+                        </table>
+                    </div>
+
+                    <!-- normal item selection field -->
+                    <div id="regularEquipmentDiv">
+                        <table>
+                            <tr>
+                                <td style="font-weight: bold;">Equipment Name</td>
+                                <td ><div style="font-weight: bold;">Equipment Type</div></td>
+                                <td style="font-weight: bold;">Quantity</td>
+                                <td ><div id="displayValue" style="font-weight: bold;">Value</div></td>
+                                <td style="width:150px; font-weight: bold;">Material</td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" id="inputEquipmentName" placeholder='i.e. "HEX-123"' style="padding-left: 3px; width: 150px;"/></td>
+                                <td >
+                                    <select name="inputEquipmentType" id="inputEquipmentType" onclick="getDisplayValue()" style="padding-left: 3px;  padding-right: 5px; width: 250px;">        
+                                        <option selected="selected" disabled>select equipment</option>
+                                        <optgroup label="Agitators & Mixers">
+                                            <option>Propeller</option>
+                                            <option>Spiral ribbon mixer</option>
+                                            <option>Static mixer</option>
+                                        </optgroup>
+                                        <optgroup label="Boilers">
+                                            <option>Packaged, 15-40 bar</option>
+                                            <option>Field erected, 10-70 bar</option>
+                                        </optgroup>
+                                        <optgroup label="Centrifuges">
+                                            <option>High speed disk</option>
+                                            <option>Atmospheric suspended basket</option>
+                                        </optgroup>
+                                        <optgroup label="Compressors">
+                                            <option>Blower</option>
+                                            <option>Centrifugal</option>
+                                            <option>Reciprocating</option>
+                                        </optgroup>
+                                        <optgroup label="Conveyors">
+                                            <option>Belt, 0.5m wide</option>
+                                            <option>Belt, 1m wide</option>
+                                            <option>Bucket elevator, 0.5m bucket</option>
+                                        </optgroup>
+                                        <optgroup label="Crushers">
+                                            <option>Reversible hammer mill</option>
+                                            <option>Pulverisers</option>
+                                        </optgroup>
+                                        <optgroup label="Crystallizers">
+                                            <option>Scraped surface crystallizer</option>
+                                        </optgroup>
+                                        <optgroup label="Distillation Columns">
+                                            <option disabled>See Pressure vessels, Packing, and Trays</option>
+                                        </optgroup>
+                                        <optgroup label="Dryers">
+                                            <option>Direct contact Rotary</option>
+                                            <option>Atmospheric tray batch</option>
+                                            <option>Spray dryer</option>
+                                        </optgroup>
+                                        <optgroup label="Evaporators">
+                                            <option>Vertical tube</option>
+                                            <option>Agitated Falling film</option>
+                                        </optgroup>
+                                        <optgroup label="Exchangers">
+                                            <option>U-tube shell and tube</option>
+                                            <option>Double pipe</option>
+                                            <option>Thermosyphon reboiler</option>
+                                            <option>U-tube Kettle reboiler</option>
+                                            <option>Plate and frame exchanger</option>
+                                        </optgroup>
+                                        <optgroup label="Filters">
+                                            <option>Plate and frame filter</option>
+                                            <option>Vacuum drum</option>
+                                        </optgroup>
+                                        <optgroup label="Furnaces">
+                                            <option>Cylindrical</option>
+                                            <option>Box</option>
+                                        </optgroup>
+                                        <optgroup label="Packings">
+                                            <option>304 ss Raschig rings</option>
+                                            <option>Ceramic intalox saddles</option>
+                                            <option>304 ss Pall rings</option>
+                                            <option>PVC structured packing</option>
+                                            <option>304 ss structured packing</option>
+                                        </optgroup>
+                                        <optgroup label="Pressure Vessels">
+                                            <option>Vertical, cs</option>
+                                            <option>Horizontal, cs</option>
+                                            <option>Vertical, 304 ss</option>
+                                            <option>Horizontal, 304 ss</option>
+                                        </optgroup>
+                                        <optgroup label="Pumps and Drivers">
+                                            <option>Single stage centrifugal</option>
+                                            <option>Explosion proof motor</option>
+                                            <option>Condensing steam turbine</option>
+                                        </optgroup>
+                                        <optgroup label="Reactors">
+                                            <option>Jacketed, agitated</option>
+                                            <option>Jacketed, agitated, glass lined</option>
+                                        </optgroup>
+                                        <optgroup label="Tanks">
+                                            <option>Floating roof</option>
+                                            <option>Cone roof</option>
+                                        </optgroup>
+                                        <optgroup label="Trays">
+                                            <option>Sieve trays</option>
+                                            <option>Valve trays</option>
+                                            <option>Bubble cap trays</option>
+                                        </optgroup>
+                                        <optgroup label="Utilities">
+                                            <option>Cooling tower & pumps</option>
+                                            <option>Packaged mechanical refrigerator</option>
+                                            <option>Water ion exchange plant</option>
+                                        </optgroup>
+                                    </select>
+                                </td>
+                                <td><input type="number" id="inputQuantity" placeholder='#' style="padding-left: 3px; width: 70px;"/></td>
+                                <td><input type="number" id="inputCharacteristicValue" placeholder='Characteristic Value' style="padding-left: 3px; width: 200px;"/></td>
+                                <td>
+                                    <select name="material" id="inputMaterial" style="padding-left: 3px; padding-right: 5px; width: 100%; width: 150px;">
+                                        <option>Carbon Steel</option>
+                                        <option>Aluminium</option>
+                                        <option>Bronze</option>
+                                        <option>Cast Steel</option>
+                                        <option>SS 304</option>
+                                        <option>SS 316</option>
+                                        <option>SS 321</option>
+                                        <option>Hastelloy C</option>
+                                        <option>Monel</option>
+                                        <option>Nickel</option>
+                                        <option>Inconel</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <button onclick="addRow()">Add Item</button>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <br>
+                    <span>Add custom equipment?<input type="checkbox" id="inputCustomEquipment" onclick="getDisplayCustomEquipment()"/></span>
+                    <br>
+                    <br>        
+                </div>
+                <br>
+
+                <!-- Final Results -->
+                <H3>Total Cost Results</H3>
+                <table>
+                    <tr>
+                        <td style="font-weight: bold;"><div style="width:150px;">Description</div></td>
+                        <td style="font-weight: bold;"><div style="width:150px;">Value</div></td>
+                    </tr>
+                    <tbody>
+                        <tr>
+                            <td><div style="width:350px;">Total Cost of Equipment [<span id="currencyBox3"></span>]:</div></td>
+                            <td><div id="outputCe"></div></td>
+                        </tr>
+                        <tr>
+                            <td><div style="width:350px;">Installation cost factor (Towler & Sinnott):</div></td>
+                            <td><div id="outputISBLfact"></div></td>
+                        </tr>
+                        <tr>
+                            <td><div style="width:350px;">ISBL [<span id="currencyBox1"></span>]:</div></td>
+                            <td><div id="outputISBL"></div></td>
+                        </tr>
+                        <tr>
+                            <td><div style="width:350px;">Offsites factor (OS):</div></td>
+                            <td><div style="width:350px;"><input type="number" id="inputOS" value='0.3' onkeyup="calculateTotalCosts()" style="padding-left: 3px; width: 150px; "/></div></td>
+                        </tr>
+                        <tr>
+                            <td><div style="width:350px;">Design & Engineering factor (D&E):</div></td>
+                            <td><div style="width:350px;"><input type="number" id="inputDnE" value='0.3' onkeyup="calculateTotalCosts()" style="padding-left: 3px; width: 150px;"/></div></td>
+                        </tr>
+                        <tr>
+                            <td><div style="width:350px;">Contingency factor (X):</div></td>
+                            <td><div style="width:350px;"><input type="number" id="inputX" value='0.1' onkeyup="calculateTotalCosts()" style="padding-left: 3px; width: 150px;"/></div></td>
+                        </tr>
+                        <tr>
+                            <td><div style="width:350px;">Total Fixed Capital Cost [<span id="currencyBox2"></span>]:</div></td>
+                            <td><div id="outputTFCC" value='0'></div></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+
+                <!-- <div>
+                    <button onclick="reload()">Reset</button>
+                </div> -->
+                
+                <div id="popup"></div>
+                <div class="reset-popup">
+                    <div style="position: absolute; top: 0; left: 0; background-color: black; opacity: 0.5; width: 100%; height: 100%;"></div>
+                    <div style="position: absolute; top: 0; left: 0; padding: 5%;">
+                        <div style="padding: 5%;  background-color: white;">
+                            <p style="color:red">Are you sure you want to reload? All current progress will be lost.</p>
+                            <button onclick="window.location.reload()" style="text-align: center;">Reset</button>
+                            <button onclick="reloadcancel()" style="text-align: center;">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <br>
+            </div>
+        </div>
+        <script src="script.js"></script>
+    </body>
+</html>
