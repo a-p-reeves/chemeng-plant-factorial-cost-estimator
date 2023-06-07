@@ -12,6 +12,35 @@
 //                                                                                                              //
 //##############################################################################################################//
 
+// currency format
+const formatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: document.getElementById('inputCurrency').value,
+  
+    // These options are needed to round to whole numbers if that's what you want.
+    //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
+    //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
+  });
+
+//let addBtn = document.getElementById('addBtn');
+let removeBtn = document.getElementById('removeBtn');
+let table = document.getElementById('maintable');
+
+let r = 0;          //row index
+let ISBL = 0;       //isbl default value
+let TFCC = 0;       //total fixed capital cost default value
+
+// table data
+var tableEquipmentLabel = [];                   // equipment name for each row  !!! Need to add in HTML !!!
+var tableEquipmentType = [];                    // equipment type for each row
+var tableQuantity = [];                         // quantity for each row
+var tableCharacteristicValue = [];              // characteristic costing value for each row
+var tableCharacteristicValueDesc = [];          // description and unit of each value
+var tableMaterial = [];                         // material for each row
+var tableEquipmentCost = [];                    // equipment cost for each row [calculated]
+var tableInstalledEquipmentCost = [];           // installed equipment cost for each row [calculated]
+
+
 function initialize() {
     //runs on page load
 
@@ -43,23 +72,6 @@ function reloadcancel() {
     document.getElementById('popup').innerHTML = '<style>.reset-popup{visibility: hidden;}</style>';
 }
 
-//let addBtn = document.getElementById('addBtn');
-let removeBtn = document.getElementById('removeBtn');
-let table = document.getElementById('maintable');
-
-let r = 0;          //row index
-let ISBL = 0;       //isbl default value
-let TFCC = 0;       //total fixed capital cost default value
-
-// table data
-var tableEquipmentLabel = [];                   // equipment name for each row  !!! Need to add in HTML !!!
-var tableEquipmentType = [];                    // equipment type for each row
-var tableQuantity = [];                         // quantity for each row
-var tableCharacteristicValue = [];              // characteristic costing value for each row
-var tableCharacteristicValueDesc = [];          // description and unit of each value
-var tableMaterial = [];                         // material for each row
-var tableEquipmentCost = [];                    // equipment cost for each row [calculated]
-
 function drawTable() {
     
     let i = 0;
@@ -80,8 +92,6 @@ function drawTable() {
             ( returnEquipmentData(tableEquipmentType[i],'a')+returnEquipmentData(tableEquipmentType[i],'b')*(tableCharacteristicValue[i])**returnEquipmentData(tableEquipmentType[i],'n') )
             //quantity
             *tableQuantity[i]
-            //material
-            *returnMaterialFactor(tableMaterial[i])
             //currency exchange
             *document.getElementById('inputExchangeRate').value
             //inflation (CEPCI)
@@ -89,6 +99,9 @@ function drawTable() {
             //location factor
             *document.getElementById('inputLocFac').value
             ;
+
+            //installed cost
+            tableInstalledEquipmentCost[i] = calculateInstalledCost(i);
         }
         else {          //if custom value is specified
             tableEquipmentCost[i] = +(document.getElementById('inputCustomCost').value)*tableQuantity[i];
@@ -108,7 +121,8 @@ function drawTable() {
         <td>`+tableQuantity[i]+`</td>
         <td>`+tableCharacteristicValue[i]+`</td>
         <td>`+tableMaterial[i]+`</td>
-        <td>`+(tableEquipmentCost[i]).toFixed(2)+`</td>
+        <td>`+formatter.format(tableEquipmentCost[i].toFixed(2))+`</td>
+        <td>`+formatter.format(tableInstalledEquipmentCost[i].toFixed(2))+`</td>
         <td><button onclick="deleteRow(`+(i+1)+`)">Delete</button></td>
         </tr>
         `
@@ -300,11 +314,10 @@ function getDisplayValue() {
 }
 
 function getDisplayCurrency() {
-    document.getElementById('currencyBox').innerHTML = "Equipment Cost <div style='font-size:small;'>("+document.getElementById('inputCurrency').value+", CEPCI="+document.getElementById('inputCEPCI').value+")</div>";
+    document.getElementById('currencyBox').innerHTML = document.getElementById('inputCurrency').value+", "+document.getElementById('inputCountry').value+" basis, CEPCI="+document.getElementById('inputCEPCI').value+".";
     document.getElementById('currencyBox0').innerHTML = document.getElementById('inputCurrency').value;
     document.getElementById('currencyBox1').innerHTML = document.getElementById('inputCurrency').value;
     document.getElementById('currencyBox2').innerHTML = document.getElementById('inputCurrency').value;
-    document.getElementById('currencyBox3').innerHTML = document.getElementById('inputCurrency').value;
     document.getElementById('currencyBoxCustom').innerHTML = document.getElementById('inputCurrency').value;
 }
 
@@ -1183,6 +1196,20 @@ function returnMaterialFactor(materialString) {
     else {return 1;}
 }
 
+function calculateInstalledCost(i) {
+    //adding detailed factors for process type (Table 6.4)
+    if (document.getElementById('inputProcessType').value == 'fluid'){
+        tableInstalledEquipmentCost[i] = tableEquipmentCost[i]*((1+0.8)*returnMaterialFactor(tableMaterial[i])+(2.5)); 
+    }
+    if (document.getElementById('inputProcessType').value == 'fluidsolid'){
+        tableInstalledEquipmentCost[i] = tableEquipmentCost[i]*((1+0.6)*returnMaterialFactor(tableMaterial[i])+(2.6)); 
+    }
+    if (document.getElementById('inputProcessType').value == 'solid'){
+        tableInstalledEquipmentCost[i] = tableEquipmentCost[i]*((1+0.2)*returnMaterialFactor(tableMaterial[i])+(2.3));  
+    }
+    return tableInstalledEquipmentCost[i];
+}
+
 function calculateTotalCosts() {
     i = 0;
     ISBL = 0;
@@ -1191,32 +1218,29 @@ function calculateTotalCosts() {
 
     //sum table items to get ISBL
     while (i < tableEquipmentLabel.length) {
-        costOfEquipment = costOfEquipment + tableEquipmentCost[i];
+        costOfEquipment = costOfEquipment + tableInstalledEquipmentCost[i];
         i++
     }
 
     //output total cost of equipment 
-    document.getElementById('outputCe').innerHTML = '<input value="'+costOfEquipment.toFixed(2)+'" style="padding-left: 3px; width: 150px; color:black; border: 1px;" disabled/>';
+    //document.getElementById('outputCe').innerHTML = '<input value="'+costOfEquipment.toFixed(2)+'" style="padding-left: 3px; width: 150px; color:black; border: 1px;" disabled/>';
 
     ISBL = costOfEquipment;
     //adding detailed factors for process type (Table 6.4)
     if (document.getElementById('inputProcessType').value == 'fluid'){
-        ISBL = ISBL*3.3; 
         document.getElementById('outputISBLfact').innerHTML = '<input value="'+3.3+'" style="padding-left: 3px; width: 150px; color:black; border: 1px;" disabled/>';
     }
     if (document.getElementById('inputProcessType').value == 'fluidsolid'){
-        ISBL = ISBL*3.2;
         document.getElementById('outputISBLfact').innerHTML = '<input value="'+3.2+'" style="padding-left: 3px; width: 150px; color:black; border: 1px;" disabled/>';
     }
     if (document.getElementById('inputProcessType').value == 'solid'){
-        ISBL = ISBL*2.5; 
         document.getElementById('outputISBLfact').innerHTML = '<input value="'+2.5+'" style="padding-left: 3px; width: 150px; color:black; border: 1px;" disabled/>';
     }
 
-    document.getElementById('outputISBL').innerHTML = '<input value="'+ISBL.toFixed(2)+'" style="padding-left: 3px; width: 150px; color:black; border: 1px;" disabled/>';
+    document.getElementById('outputISBL').innerHTML = '<input value="'+formatter.format(ISBL.toFixed(2))+'" style="padding-left: 3px; width: 150px; color:black; border: 1px;" disabled/>';
 
     //Total Fixed Capital Cost = ISBL + OSBL
     TFCC = ISBL*( 1 + (+document.getElementById('inputOS').value) )*( 1 + (+document.getElementById('inputDnE').value) + (+document.getElementById('inputX').value) );
     
-    document.getElementById('outputTFCC').innerHTML = '<input value="'+TFCC.toFixed(2)+'" style="padding-left: 3px; width: 150px; color:black; border: 1px; background-color: lightblue;" disabled/>';
+    document.getElementById('outputTFCC').innerHTML = '<input value="'+formatter.format(TFCC.toFixed(2))+'" style="padding-left: 3px; width: 150px; color:black; border: 1px; background-color: lightblue;" disabled/>';
 }
