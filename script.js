@@ -13,7 +13,7 @@
 //##############################################################################################################//
 
 // currency format
-const formatter = new Intl.NumberFormat('en-US', {
+var formatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: document.getElementById('inputCurrency').value,
   
@@ -44,8 +44,6 @@ var tableInstalledEquipmentCost = [];           // installed equipment cost for 
 function initialize() {
     //runs on page load
 
-    document.getElementById('popup').innerHTML = '<style>.reset-popup{visibility: hidden;}</style>';
-
     //initializes table
     drawTable();
 
@@ -54,22 +52,6 @@ function initialize() {
 
     //displays currency in table header
     getDisplayCurrency();
-}
-
-function reload() {
-    /*var c = confirm("Do you really want to reload? All progress will be lost.");
-        if(c === true)
-        {
-            index = this.parentElement.rowIndex;
-            table1.deleteRow(index);
-        }
-    */
-    document.getElementById('popup').innerHTML = '<style>.reset-popup{visibility: visible;}</style>';
-    //window.location.reload()
-}
-
-function reloadcancel() {
-    document.getElementById('popup').innerHTML = '<style>.reset-popup{visibility: hidden;}</style>';
 }
 
 function drawTable() {
@@ -314,6 +296,16 @@ function getDisplayValue() {
 }
 
 function getDisplayCurrency() {
+    // currency format
+    formatter = Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: document.getElementById('inputCurrency').value,
+    
+        // These options are needed to round to whole numbers if that's what you want.
+        //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
+        //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
+    });
+    
     document.getElementById('currencyBox').innerHTML = document.getElementById('inputCurrency').value+", "+document.getElementById('inputCountry').value+" basis, CEPCI="+document.getElementById('inputCEPCI').value+".";
     document.getElementById('currencyBox0').innerHTML = document.getElementById('inputCurrency').value;
     document.getElementById('currencyBox1').innerHTML = document.getElementById('inputCurrency').value;

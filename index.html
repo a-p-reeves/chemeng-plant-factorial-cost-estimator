@@ -40,6 +40,11 @@
                         <tr>
                             <td><div style="width:150px;">Currency:</div></td>
                             <td><div style="width:150px;"><select name="currency" id="inputCurrency" onclick="getDisplayCurrency(); drawTable()" style="padding-left: 3px; padding-right: 5px; width: 90%;">
+                                <option disabled>Commonly selected:</option>
+                                <option value="USD" selected="selected">US Dollar</option>
+                                <option value="EUR">Euro</option>
+                                <option value="GBP">British Pound Sterling</option>
+                                <option disabled>---------------------------------</option>
                                 <option value="AFN">Afghan Afghani</option>
                                 <option value="ALL">Albanian Lek</option>
                                 <option value="DZD">Algerian Dinar</option>
@@ -197,7 +202,7 @@
                                 <option value="UAH">Ukrainian Hryvnia</option>
                                 <option value="AED">United Arab Emirates Dirham</option>
                                 <option value="UYU">Uruguayan Peso</option>
-                                <option value="USD" selected="selected">US Dollar</option>
+                                <option value="USD">US Dollar</option>
                                 <option value="UZS">Uzbekistan Som</option>
                                 <option value="VUV">Vanuatu Vatu</option>
                                 <option value="VEF">Venezuelan BolÃ­var</option>
@@ -485,8 +490,8 @@
                         <td style="font-weight: bold;"><div style="width:70px;">Quantity</div></td>
                         <td style="font-weight: bold;"><div style="width:200px;">Value</div></td>
                         <td style="font-weight: bold;"><div style="width:150px;">Material</div></td>
-                        <td style="font-weight: bold;"><div style="width:150px;">Purchase Cost, CS basis (C<sub>e,i,CS</sub>)</div></td>
-                        <td style="font-weight: bold;"><div style="width:150px;">Installed Cost, material basis (C<sub>e,i,inst,mat</sub>)</div></td>
+                        <td style="font-weight: bold;"><div style="width:150px;">Purchase Cost, CS basis</div></td>
+                        <td style="font-weight: bold;"><div style="width:150px;">Installed Cost, material basis</div></td>
                         <td style="font-weight: bold;"><div style="width:100px;"><button onclick="deleteAll();">Delete All</button></div></td>
                     </tr>
                     <tbody id="maintable"></tbody>
@@ -549,7 +554,7 @@
                             </tr>
                             <tr>
                                 <td><input type="text" id="inputEquipmentName" placeholder='i.e. "HEX-123"' style="padding-left: 3px; width: 150px;"/></td>
-                                <td >
+                                <td>
                                     <select name="inputEquipmentType" id="inputEquipmentType" onclick="getDisplayValue()" style="padding-left: 3px;  padding-right: 5px; width: 250px;">        
                                         <option selected="selected" disabled>select equipment</option>
                                         <optgroup label="Agitators & Mixers">
@@ -707,23 +712,6 @@
                         </tr>
                     </tbody>
                 </table>
-
-
-                <!-- <div>
-                    <button onclick="reload()">Reset</button>
-                </div> -->
-                
-                <div id="popup"></div>
-                <div class="reset-popup">
-                    <div style="position: absolute; top: 0; left: 0; background-color: black; opacity: 0.5; width: 100%; height: 100%;"></div>
-                    <div style="position: absolute; top: 0; left: 0; padding: 5%;">
-                        <div style="padding: 5%;  background-color: white;">
-                            <p style="color:red">Are you sure you want to reload? All current progress will be lost.</p>
-                            <button onclick="window.location.reload()" style="text-align: center;">Reset</button>
-                            <button onclick="reloadcancel()" style="text-align: center;">Cancel</button>
-                        </div>
-                    </div>
-                </div>
                 <br>
                 <br>
             </div>
