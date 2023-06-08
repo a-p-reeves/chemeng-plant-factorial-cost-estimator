@@ -74,6 +74,8 @@ function drawTable() {
             ( returnEquipmentData(tableEquipmentType[i],'a')+returnEquipmentData(tableEquipmentType[i],'b')*(tableCharacteristicValue[i])**returnEquipmentData(tableEquipmentType[i],'n') )
             //quantity
             *tableQuantity[i]
+            // material factor (finds purchase cost on material basis!! -> important for installed cost calculation)
+            *returnMaterialFactor(tableMaterial[i])
             //currency exchange
             *document.getElementById('inputExchangeRate').value
             //inflation (CEPCI)
@@ -272,6 +274,7 @@ function deleteRow(r) {
             tableCharacteristicValue.splice((r-1), 1);
             tableMaterial.splice((r-1), 1);
             tableEquipmentCost.splice((r-1), 1);
+            tableInstalledEquipmentCost.splice((r-1), 1);
 
             // updates visually
             drawTable();
@@ -289,6 +292,7 @@ function deleteAll() {
             tableCharacteristicValue=[];
             tableMaterial=[];
             tableEquipmentCost=[];
+            tableInstalledEquipmentCost=[];
             counter = 1;
 
             // updates visually
@@ -1213,13 +1217,13 @@ function returnMaterialFactor(materialString) {
 function calculateInstalledCost(i) {
     //adding detailed factors for process type (Table 6.4)
     if (document.getElementById('inputProcessType').value == 'fluid'){
-        tableInstalledEquipmentCost[i] = tableEquipmentCost[i]*((1+0.8)*returnMaterialFactor(tableMaterial[i])+(2.5)); 
+        tableInstalledEquipmentCost[i] = tableEquipmentCost[i]*((1+0.8)+(2.5)/returnMaterialFactor(tableMaterial[i])); 
     }
     if (document.getElementById('inputProcessType').value == 'fluidsolid'){
-        tableInstalledEquipmentCost[i] = tableEquipmentCost[i]*((1+0.6)*returnMaterialFactor(tableMaterial[i])+(2.6)); 
+        tableInstalledEquipmentCost[i] = tableEquipmentCost[i]*((1+0.6)+(2.6)/returnMaterialFactor(tableMaterial[i])); 
     }
     if (document.getElementById('inputProcessType').value == 'solid'){
-        tableInstalledEquipmentCost[i] = tableEquipmentCost[i]*((1+0.2)*returnMaterialFactor(tableMaterial[i])+(2.3));  
+        tableInstalledEquipmentCost[i] = tableEquipmentCost[i]*((1+0.2)+(2.3)/returnMaterialFactor(tableMaterial[i]));  
     }
     return tableInstalledEquipmentCost[i];
 }
