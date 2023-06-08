@@ -195,6 +195,7 @@ function addRow() {
         tableCharacteristicValue.pop();
         tableMaterial.pop();
         tableEquipmentCost.pop();
+        tableInstalledEquipmentCost.pop();
         counter--
     }
     
@@ -250,6 +251,7 @@ function addCustomRow() {
             tableCharacteristicValue.pop();
             tableMaterial.pop();
             tableEquipmentCost.pop();
+            tableInstalledEquipmentCost.pop();
             counter--
         };
         
