@@ -82,32 +82,52 @@ function drawTable() {
             *document.getElementById('inputLocFac').value
             ;
 
+            //special material cost for plate heat exchanger and reactor (base value as SS 304), as given in Towler & Sinnott table 6.6
+            //if(tableEquipmentType[i] == 'Plate and frame exchanger' || tableEquipmentType[i] == 'Jacketed, agitated' ){
+            //    tableEquipmentCost[i] = tableEquipmentCost[i]/1.3;  //divide by SS 304 material factor
+            //}
+
             //installed cost
             tableInstalledEquipmentCost[i] = calculateInstalledCost(i);
         }
         else {          //if custom value is specified
-            tableEquipmentCost[i] = +(document.getElementById('inputCustomCost').value)*tableQuantity[i];
+            tableEquipmentCost[i] = '-';
         }
 
-        //special material cost for plate heat exchanger and reactor (base value as SS 304), as given in Towler & Sinnott table 6.6
-        if(tableEquipmentType[i] == 'Plate and frame exchanger' || tableEquipmentType[i] == 'Jacketed, agitated' ){
-            tableEquipmentCost[i] = tableEquipmentCost[i]/1.3;  //divide by SS 304 material factor
+        if(tableEquipmentCost[i] != '-'){
+            //displays row i 
+            table.innerHTML += `
+            <tr id="row" class="equipmentList">
+            <td style="width:25px;">`+(i+1)+`</td>
+            <td>`+tableEquipmentLabel[i]+`</td>
+            <td>`+tableEquipmentType[i]+`</td>
+            <td>`+tableQuantity[i]+`</td>
+            <td>`+tableCharacteristicValue[i]+`</td>
+            <td>`+tableMaterial[i]+`</td>
+            <td>`+formatter.format(tableEquipmentCost[i])+`</td>
+            <td>`+formatter.format(tableInstalledEquipmentCost[i])+`</td>
+            <td><button onclick="deleteRow(`+(i+1)+`)">Delete</button></td>
+            </tr>
+            `
+        }
+        else{
+            //displays row i 
+            table.innerHTML += `
+            <tr id="row" class="equipmentList">
+            <td style="width:25px;">`+(i+1)+`</td>
+            <td>`+tableEquipmentLabel[i]+`</td>
+            <td>`+tableEquipmentType[i]+`</td>
+            <td>`+tableQuantity[i]+`</td>
+            <td>`+tableCharacteristicValue[i]+`</td>
+            <td>`+tableMaterial[i]+`</td>
+            <td>`+'-'+`</td>
+            <td>`+formatter.format(tableInstalledEquipmentCost[i])+`</td>
+            <td><button onclick="deleteRow(`+(i+1)+`)">Delete</button></td>
+            </tr>
+            `
         }
 
-        //displays row i 
-        table.innerHTML += `
-        <tr id="row" class="equipmentList">
-        <td style="width:25px;">`+(i+1)+`</td>
-        <td>`+tableEquipmentLabel[i]+`</td>
-        <td>`+tableEquipmentType[i]+`</td>
-        <td>`+tableQuantity[i]+`</td>
-        <td>`+tableCharacteristicValue[i]+`</td>
-        <td>`+tableMaterial[i]+`</td>
-        <td>`+formatter.format(tableEquipmentCost[i].toFixed(2))+`</td>
-        <td>`+formatter.format(tableInstalledEquipmentCost[i].toFixed(2))+`</td>
-        <td><button onclick="deleteRow(`+(i+1)+`)">Delete</button></td>
-        </tr>
-        `
+
         i++
     }
     
@@ -212,8 +232,8 @@ function addCustomRow() {
     
         tableMaterial.push(document.getElementById('inputCustomMaterial').value);
     
-        //add placeholder zero to cost array, gets calculated in drawTable() as to update if other factors are changed
-        tableEquipmentCost.push(tableEquipmentCost[0]);
+        //inputs cost value directly, as not calculated
+        tableInstalledEquipmentCost.push(+(document.getElementById('inputCustomCost').value)*tableQuantity[i]);
     
         // warning if no value specified
         if (document.getElementById('inputCustomCost').value == 0) {
